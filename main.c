@@ -53,14 +53,14 @@ int main() {
             execution_times[0][j][i] = elapsed_time; // Algoritmo 1
 
             gettimeofday(&start2, NULL);
-            //branch_and_bound(result, n_values[j]);
+            branch_and_bound(result, n_values[j]);
             gettimeofday(&end2, NULL);
             elapsed_time = getElapsedTime(start2, end2);
             execution_times[1][j][i] = elapsed_time; // Algoritmo 2
 
 
             gettimeofday(&start3, NULL);
-            backtracking(result, n_values[j]);
+            //backtracking(result, n_values[j]);
             gettimeofday(&end3, NULL);
             elapsed_time = getElapsedTime(start2, end2);
             execution_times[2][j][i] = elapsed_time; // Algoritmo 3

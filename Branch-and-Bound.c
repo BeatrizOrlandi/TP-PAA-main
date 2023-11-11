@@ -3,12 +3,13 @@
 #include <stdlib.h>
 #include <time.h>
 
-
-int compareItems(const void* a, const void* b) {
-    double ratioA = (double)((struct ItemB*)a)->value / ((struct ItemB*)a)->weight;
-    double ratioB = (double)((struct ItemB*)b)->value / ((struct ItemB*)b)->weight;
-    if (ratioA > ratioB) return -1;
-    if (ratioA < ratioB) return 1;
+int compareItems(const void *a, const void *b) {
+    double ratioA = (double)(((struct ItemB *)b)->value) / (((struct ItemB *)b)->weight);
+    double ratioB = (double)(((struct ItemB *)a)->value) / (((struct ItemB *)a)->weight);
+    if (ratioA > ratioB)
+        return 1;
+    if (ratioA < ratioB)
+        return -1;
     return 0;
 }
 
@@ -16,20 +17,20 @@ double bound(struct Node u, int n, int W, struct ItemB arr[]) {
     if (u.weight >= W)
         return 0;
 
-    double profit_bound = u.value;
+    double profitBound = u.value;
     int j = u.level + 1;
-    int total_weight = u.weight;
+    int totalWeight = u.weight;
 
-    while ((j < n) && (total_weight + arr[j].weight <= W)) {
-        total_weight += arr[j].weight;
-        profit_bound += arr[j].value;
+    while ((j < n) && (totalWeight + arr[j].weight <= W)) {
+        totalWeight += arr[j].weight;
+        profitBound += arr[j].value;
         j++;
     }
 
     if (j < n)
-        profit_bound += (W - total_weight) * (double)arr[j].value / arr[j].weight;
+        profitBound += (W - totalWeight) * (double)arr[j].value / arr[j].weight;
 
-    return profit_bound;
+    return profitBound;
 }
 
 void knapsackBranchAndBound(int W, struct ItemB arr[], int n) {
@@ -61,8 +62,6 @@ void knapsackBranchAndBound(int W, struct ItemB arr[], int n) {
         v.bound = bound(v, n, W, arr);
 
         if (v.bound > maxProfit) {
-            if (v.weight <= W && v.value > maxProfit)
-                maxProfit = v.value;
             rear++;
             priorityQueue[rear] = v;
         }

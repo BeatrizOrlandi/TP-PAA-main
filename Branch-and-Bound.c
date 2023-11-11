@@ -1,33 +1,18 @@
+#include "Branch-and-Bound.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
-struct Item {
-    int value;
-    int weight;
-    int index;
-};
-
-struct Node {
-    int level;
-    int value;
-    int weight;
-    double bound;
-};
-
-int max(int a, int b) {
-    return (a > b) ? a : b;
-}
 
 int compareItems(const void* a, const void* b) {
-    double ratioA = (double)((struct Item*)a)->value / ((struct Item*)a)->weight;
-    double ratioB = (double)((struct Item*)b)->value / ((struct Item*)b)->weight;
+    double ratioA = (double)((struct ItemB*)a)->value / ((struct ItemB*)a)->weight;
+    double ratioB = (double)((struct ItemB*)b)->value / ((struct ItemB*)b)->weight;
     if (ratioA > ratioB) return -1;
     if (ratioA < ratioB) return 1;
     return 0;
 }
 
-double bound(struct Node u, int n, int W, struct Item arr[]) {
+double bound(struct Node u, int n, int W, struct ItemB arr[]) {
     if (u.weight >= W)
         return 0;
 
@@ -47,8 +32,8 @@ double bound(struct Node u, int n, int W, struct Item arr[]) {
     return profit_bound;
 }
 
-void knapsackBranchAndBound(int W, struct Item arr[], int n) {
-    qsort(arr, n, sizeof(struct Item), compareItems);
+void knapsackBranchAndBound(int W, struct ItemB arr[], int n) {
+    qsort(arr, n, sizeof(struct ItemB), compareItems);
 
     struct Node u, v;
     u.level = -1;
@@ -104,22 +89,35 @@ void knapsackBranchAndBound(int W, struct Item arr[], int n) {
     free(priorityQueue);
 }
 
-int main() {
-    clock_t start = clock();
-    int W, n;
+int branch_and_bound(char* filename, int n) {
+    int W;
 
-    FILE *file = fopen("input.txt", "r");
+    FILE *file = fopen(filename, "r");
     if (file == NULL) {
         printf("Erro ao abrir o arquivo.\n");
         return 1;
     }
 
-    fscanf(file, "%d", &W);
-    fscanf(file, "%d", &n);
+    if (fscanf(file, "%d", &W) != 1) {
+        printf("Erro ao ler o valor de W do arquivo.\n");
+        fclose(file);
+        return 1;
+    }
 
-    struct Item items[n];
+    struct ItemB *items = malloc(sizeof(struct ItemB) * n);
+    if (items == NULL) {
+        printf("Erro ao alocar memória para os itens.\n");
+        fclose(file);
+        return 1;
+    }
+
     for (int i = 0; i < n; i++) {
-        fscanf(file, "%d %d", &items[i].weight, &items[i].value);
+        if (fscanf(file, "%d %d", &items[i].weight, &items[i].value) != 2) {
+            printf("Erro ao ler os itens do arquivo.\n");
+            free(items);
+            fclose(file);
+            return 1;
+        }
         items[i].index = 0;
     }
 
@@ -127,9 +125,7 @@ int main() {
 
     knapsackBranchAndBound(W, items, n);
 
-    clock_t end = clock();
-    double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("\nTempo de Execucao: %f segundos\n", time_spent);
+    free(items);
 
     return 0;
 }

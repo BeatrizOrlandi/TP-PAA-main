@@ -5,6 +5,8 @@
 #include <sys/time.h>
 #include "gerador.h"
 #include "prog_dinamica.h"
+#include "Branch-and-Bound.h"
+#include "backtracking.h"
 
 // Estruturas e algoritmos definidos aqui
 
@@ -22,24 +24,48 @@ int main() {
     double execution_times[3][QTD][20]; // 3 algoritmos, QTD tamanhos de instâncias
 
   
-    for (int j = 0; j < sizeof(n_values) / sizeof(n_values[0]); j++) {
+    for (int j = 0; j < (int)(sizeof(n_values) / sizeof(n_values[0])); j++) {
         struct timeval start, end;
-        
+        struct timeval start2, end2;
+        struct timeval start3, end3;
+
         for (int i = 0; i < 20; i++) {  
             n = (int*) malloc(sizeof(int)*n_values[j]);
             w = (int*) malloc(sizeof(int)*n_values[0]);
-            readValuesFromFile(generateRandomInstance(j, n_values[j], 100), n, w, &W) ;
+            char *result = generateRandomInstance(j, n_values[j], 100);
+            if (result == NULL) {
+                printf("Falha ao gerar instância aleatória.\n");
+                continue;  // Pule para a próxima iteração
+            }
+
+            printf("Arquivo gerado: %s\n", result);
+
+            if (!readValuesFromFile(result, n, w, &W)) {
+                printf("Falha ao ler valores do arquivo.\n");
+                free(result);
+                continue;  // Pule para a próxima iteração
+            }
 
             gettimeofday(&start, NULL);
-            prog_dinamica();
+            prog_dinamica(result, n_values[j]);
             gettimeofday(&end, NULL);
             double elapsed_time = getElapsedTime(start, end);
-
-            // Calcule a média de tempo aqui
             execution_times[0][j][i] = elapsed_time; // Algoritmo 1
-            // execution_times[1][j] += elapsed_time; // Algoritmo 2
-            // execution_times[2][j] += elapsed_time; // Algoritmo 3
 
+            gettimeofday(&start2, NULL);
+            //branch_and_bound(result, n_values[j]);
+            gettimeofday(&end2, NULL);
+            elapsed_time = getElapsedTime(start2, end2);
+            execution_times[1][j][i] = elapsed_time; // Algoritmo 2
+
+
+            gettimeofday(&start3, NULL);
+            backtracking(result, n_values[j]);
+            gettimeofday(&end3, NULL);
+            elapsed_time = getElapsedTime(start2, end2);
+            execution_times[2][j][i] = elapsed_time; // Algoritmo 3
+
+            free(result);
             free(n);
             free(w);
         }

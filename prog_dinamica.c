@@ -3,11 +3,6 @@
 #include <time.h>
 #include "prog_dinamica.h"
 
-struct Item {
-    int value;
-    int weight;
-};
-
 int max(int a, int b) {
     return (a > b) ? a : b;
 }
@@ -56,18 +51,17 @@ void knapsackDP(int W, struct Item items[], int n) {
     free(dp);
 }
 
-void prog_dinamica() {
+void prog_dinamica(char *filename, int n) {
     clock_t start = clock();
-    int W, n;
+    int W;
     
-    FILE *file = fopen("input.txt", "r");
+    FILE *file = fopen(filename, "r");
     if (file == NULL) {
         printf("Erro ao abrir o arquivo.\n");
-        return 1;
+        return;
     }
     
     fscanf(file, "%d", &W);
-    fscanf(file, "%d", &n);
     
     struct Item items[n];
     for (int i = 0; i < n; i++) {

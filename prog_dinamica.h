@@ -8,6 +8,6 @@ struct Item {
 
 int max(int a, int b);
 void knapsackDP(int W, struct Item items[], int n);
-void prog_dinamica();
+void prog_dinamica(char* filename, int n);
 
 #endif
